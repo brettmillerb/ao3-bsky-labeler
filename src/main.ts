@@ -2,7 +2,7 @@ import { CommitCreateEvent, Jetstream } from '@skyware/jetstream';
 import fs from 'node:fs';
 import WebSocket from 'ws';
 
-import { CURSOR_UPDATE_INTERVAL, DID, FIREHOSE_URL, METRICS_PORT, PORT, WANTED_COLLECTION } from './config.js';
+import { CURSOR_UPDATE_INTERVAL, DID, FIREHOSE_URL, METRICS_PORT, PORT, WANTED_COLLECTION, SIGNING_KEY } from './config.js';
 import { label, labelerServer } from './label.js';
 import logger from './logger.js';
 import { startMetricsServer } from './metrics.js';
@@ -68,12 +68,22 @@ jetstream.onCreate(WANTED_COLLECTION, (event: CommitCreateEvent<typeof WANTED_CO
 
 const metricsServer = startMetricsServer(METRICS_PORT);
 
-labelerServer.start(PORT, (error, address) => {
-  if (error) {
-    logger.error('Error starting server: %s', error);
-  } else {
-    logger.info(`Labeler server listening on ${address}`);
-  }
+// const server = new labelerServer({
+//   did: DID,
+//   signingKey: SIGNING_KEY,
+// });
+
+// labelerServer.start(PORT, (error, address) => {
+//   if (error) {
+//     logger.error('Error starting server: %s', error);
+//   } else {
+//     logger.info(`Labeler server listening on ${address}`);
+//   }
+// });
+
+labelerServer.app.listen({ port: PORT, host: "0.0.0.0" }, (error, address) => {
+  if (error) console.error(error);
+    else console.log(`Labeler server listening on ${address}`);
 });
 
 jetstream.start();
