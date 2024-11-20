@@ -71,3 +71,88 @@ You can check that the labeler is reachable by checking the `/xrpc/com.atproto.l
 - [alice](https://bsky.app/profile/did:plc:by3jhwdqgbtrcc7q4tkkv3cf), creator of the [Zodiac Sign Labels](https://github.com/aliceisjustplaying/zodiacsigns)
 - [Juliet](https://bsky.app/profile/did:plc:b3pn34agqqchkaf75v7h43dk), author of the [Pronouns labeler](https://github.com/notjuliet/pronouns-bsky), whose code my labelers were originally based on
 - [futur](https://bsky.app/profile/did:plc:uu5axsmbm2or2dngy4gwchec), creator of the [skyware libraries](https://skyware.js.org/) which make it easier to build things for Bluesky
+
+
+----------
+
+# Manual Azure VM Setup Instructions
+
+### Install zsh because I'm not a monster
+```
+sudo apt install zsh zplug
+```
+Optional configuration for zsh: (https://wiki.debian.org/Zsh)[https://wiki.debian.org/Zsh]
+
+### Prepare for installation
+```
+sudo apt update && sudo apt upgrade -y
+sudo apt install git build-essential -y
+```
+
+### Add node source for newer version as bookworm only installs v18
+```
+curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash -
+sudo apt install nodejs -y
+```
+
+### Check the versions
+```
+git --version
+node -v
+npm -v
+```
+
+### Install Caddy
+```
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo tee /usr/share/keyrings/caddy-stable-archive-keyring.gpg > /dev/null
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/deb/debian/caddy-stable.list' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install caddy
+```
+
+### Caddy Configuration
+Create a Caddyfile Configuration:
+- In the Caddy VM, create or edit the Caddyfile located in `/etc/caddy/Caddyfile`
+
+### Ensure Caddy is running as a service
+sudo systemctl status caddy
+
+```
+my.domain.tld {
+	reverse_proxy localhost:4100
+}
+```
+
+### Restart Caddy to apply the configuration
+`sudo systemctl restart caddy`
+
+### Install Bun
+`curl -fsSL https://bun.sh/install | bash`
+
+Add
+
+```
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+source $HOME/.zshrc
+bun -version
+```
+
+### Clone your project
+`git clone https://`
+
+# Install dependencies with bun
+`Bun i`
+
+## Create A Record to point to the VM
+Create an A record in your DNS provider to point to the VM's IP address.
+
+## Virtual Machine Port Configuration
+Make sure to open the ports in the VM configuration for the Caddy server to work properly.
+
+| Name | Protocol | Port | Source | Destination |
+|------|----------|---------| --| -- |
+AllowAnyHTTPInbound | TCP | 80 | Any | Any |
+AllowAnyHTTPSInbound | TCP | 443 | Any | Any |

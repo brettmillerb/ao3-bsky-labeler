@@ -83,7 +83,7 @@ const metricsServer = startMetricsServer(METRICS_PORT);
 
 labelerServer.app.listen({ port: PORT, host: "0.0.0.0" }, (error, address) => {
   if (error) console.error(error);
-    else console.log(`Labeler server listening on ${address}`);
+    else logger.info(`Labeler server listening on ${address}`);
 });
 
 jetstream.start();
